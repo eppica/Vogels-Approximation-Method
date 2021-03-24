@@ -11,7 +11,3 @@ matrix = [
 need = [7, 5, 3, 2]
 
 availability = [6, 1, 10]
-
-origin_penalty = []
-
-destination_penalty = []
