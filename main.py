@@ -22,18 +22,18 @@ def sum_without_none(iterable):
 
 def insert_artificial_origin():
     origin.append('dummy')
-    for line in matrix:
-        line.append(999)
-    availability.append(abs(sum(need) - sum(availability)))
+    line = []
+    for i in range(0, len(destination)):
+        line.append(0)
+    matrix.append(line)
+    availability.append(sum(need) - sum(availability))
 
 
 def insert_artificial_destination():
     destination.append('dummy')
-    line = []
-    for i in range(0, len(destination)):
+    for line in matrix:
         line.append(999)
-    matrix.append(line)
-    need.append(abs(sum(availability) - sum(need)))
+    need.append(sum(availability) - sum(need))
 
 
 def calculate_penalties():
@@ -42,12 +42,12 @@ def calculate_penalties():
     column = []
 
     for i, line in enumerate(matrix):
-        origin_penalty.append(difference_lower_costs(iterable_without_none(line.copy(), availability)))
+        origin_penalty.append(difference_lower_costs(iterable_without_none(line.copy(), need)))
 
     for j in range(0, len(matrix[0])):
         for k in range(0, len(matrix)):
             column.append(matrix[k][j])
-        destination_penalty.append(difference_lower_costs(iterable_without_none(column, need)))
+        destination_penalty.append(difference_lower_costs(iterable_without_none(column, availability)))
         column.clear()
 
     return [origin_penalty, destination_penalty]
@@ -92,17 +92,17 @@ def find_lower_cell(origin_penalty, destination_penalty):
         index_max_difference = destination_penalty.index(max_difference_destination)
         result.append(index_max_difference)
         column = get_column(index_max_difference)
-        lower_cost_value = min(iterable_without_none(column, need))
+        lower_cost_value = min(iterable_without_none(column, availability))
         result.append(lower_cost_value)
         result.append(column.index(lower_cost_value))
-        result.reverse()
     else:
         index_max_difference = origin_penalty.index(max_difference_origin)
         result.append(index_max_difference)
         line = matrix[index_max_difference]
-        lower_cost_value = min(iterable_without_none(line, availability))
+        lower_cost_value = min(iterable_without_none(line, need))
         result.append(lower_cost_value)
         result.append(line.index(lower_cost_value))
+        result.reverse()
 
     return result
 
@@ -116,9 +116,9 @@ def calculate_result():
 
 
 def main():
-    if sum(availability) > sum(need):
+    if sum(need) > sum(availability):
         insert_artificial_origin()
-    elif sum(availability) < sum(need):
+    elif sum(availability) > sum(need):
         insert_artificial_destination()
 
     reset_result_matrix()
@@ -127,24 +127,24 @@ def main():
         if len(iterable_without_none(availability)) > 1 and len(iterable_without_none(need)) > 1:
 
             origin_penalty, destination_penalty = calculate_penalties()
-            index_lower_cost_value, lower_cost_value, index_max_difference = find_lower_cell(
+            index_column_need, lower_cost_value, index_line_availability = find_lower_cell(
                 origin_penalty, destination_penalty)
 
-            value_availability = availability[index_max_difference]
-            value_need = need[index_lower_cost_value]
+            value_availability = availability[index_line_availability]
+            value_need = need[index_column_need]
 
             if value_need < value_availability:
-                result_matrix[index_lower_cost_value][index_max_difference] = lower_cost_value * value_need
-                for i in range(0, len(matrix[0])):
-                    matrix[index_lower_cost_value][i] = 0
-                need[index_lower_cost_value] = None
-                availability[index_max_difference] -= value_need
-            else:
-                result_matrix[index_lower_cost_value][index_max_difference] = lower_cost_value * value_availability
+                result_matrix[index_line_availability][index_column_need] = lower_cost_value * value_need
                 for i in range(0, len(matrix)):
-                    matrix[i][index_max_difference] = 0
-                availability[index_max_difference] = None
-                need[index_lower_cost_value] -= value_availability
+                    matrix[i][index_column_need] = 0
+                need[index_column_need] = None
+                availability[index_line_availability] -= value_need
+            else:
+                result_matrix[index_line_availability][index_column_need] = lower_cost_value * value_availability
+                for i in range(0, len(matrix[0])):
+                    matrix[index_line_availability][i] = 0
+                availability[index_line_availability] = None
+                need[index_column_need] -= value_availability
         elif len(iterable_without_none(need)) == 1:
             for i in range(0, len(result_matrix)):
                 for j in range(0, len(result_matrix[0])):
