@@ -36,7 +36,7 @@ After that you should see a venv directory.
 
 To run commands using venv, go to ```Scripts``` directory inside ```venv```:
 ```
-project
+Vogels-Approximation-Method
 │   main.py
 │   ...
 └─── 🗀 venv
