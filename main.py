@@ -58,6 +58,9 @@ def difference_lower_costs(iterable):
     best = min(iterable)
     iterable.remove(best)
 
+    if len(iterable) == 0:
+        return best
+
     alternative = min(iterable)
 
     return abs(alternative - best)
@@ -124,39 +127,26 @@ def main():
     reset_result_matrix()
 
     while (sum_without_none(availability) + sum_without_none(need)) != 0:
-        if len(iterable_without_none(availability)) > 1 and len(iterable_without_none(need)) > 1:
 
-            origin_penalty, destination_penalty = calculate_penalties()
-            index_column_need, lower_cost_value, index_line_availability = find_lower_cell(
-                origin_penalty, destination_penalty)
+        origin_penalty, destination_penalty = calculate_penalties()
+        index_column_need, lower_cost_value, index_line_availability = find_lower_cell(
+            origin_penalty, destination_penalty)
 
-            value_availability = availability[index_line_availability]
-            value_need = need[index_column_need]
+        value_availability = availability[index_line_availability]
+        value_need = need[index_column_need]
 
-            if value_need < value_availability:
-                result_matrix[index_line_availability][index_column_need] = lower_cost_value * value_need
-                for i in range(0, len(matrix)):
-                    matrix[i][index_column_need] = 0
-                need[index_column_need] = None
-                availability[index_line_availability] -= value_need
-            else:
-                result_matrix[index_line_availability][index_column_need] = lower_cost_value * value_availability
-                for i in range(0, len(matrix[0])):
-                    matrix[index_line_availability][i] = 0
-                availability[index_line_availability] = None
-                need[index_column_need] -= value_availability
-        elif len(iterable_without_none(need)) == 1:
-            for i in range(0, len(result_matrix)):
-                for j in range(0, len(result_matrix[0])):
-                    if matrix[i][j] != 0 and availability[j] is not None:
-                        result_matrix[i][j] = matrix[i][j] * availability[j]
-            break
-        elif len(iterable_without_none(availability)) == 1:
-            for i in range(0, len(result_matrix)):
-                for j in range(0, len(result_matrix[0])):
-                    if matrix[i][j] != 0 and need[j] is not None:
-                        result_matrix[i][j] = matrix[i][j] * need[j]
-            break
+        if value_need < value_availability:
+            result_matrix[index_line_availability][index_column_need] = lower_cost_value * value_need
+            for i in range(0, len(matrix)):
+                matrix[i][index_column_need] = 0
+            need[index_column_need] = None
+            availability[index_line_availability] -= value_need
+        else:
+            result_matrix[index_line_availability][index_column_need] = lower_cost_value * value_availability
+            for i in range(0, len(matrix[0])):
+                matrix[index_line_availability][i] = 0
+            availability[index_line_availability] = None
+            need[index_column_need] -= value_availability
 
 
 main()
